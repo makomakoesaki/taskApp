@@ -3,10 +3,12 @@ import RealmSwift
 import UserNotifications    // 追加
 
 class InputViewController: UIViewController {
+    
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
-
+    @IBOutlet weak var categoryTextField: UITextField!
+    
     let realm = try! Realm()
     var task: Task!
 
@@ -17,24 +19,29 @@ class InputViewController: UIViewController {
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(dismissKeyboard))
         // viewにUITapGestureRecognizerを登録
         self.view.addGestureRecognizer(tapGesture)
+        // データベースにあるタスクのデータをUIに表示する
         titleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
+        categoryTextField.text = task.category
     }
 
-    // 遷移元に戻る際にタスクの内容をデータベースに保存する
+    //遷移元の画面に戻る前に処理される
     override func viewWillDisappear(_ animated: Bool) {
+        // データベースを保存する領域がストレージにない場合はアプリを強制終了する
         try! realm.write {
+            // UIに書かれた情報をデータベースに保存する
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
+            self.task.category = self.categoryTextField.text!
             self.realm.add(self.task, update: .modified)
         }
+        // ローカル通知を設定する
         setNotification(task: task)
         super.viewWillDisappear(animated)
     }
     
-    // ローカル通知を設定する
     func setNotification(task: Task) {
         // UNMutableNotificationContentとは通知の編集可能なコンテンツ
         let content = UNMutableNotificationContent()
@@ -45,6 +52,14 @@ class InputViewController: UIViewController {
         } else {
             // タイトルがある時は、通知のタイトルにローカライズされたタイトルを提供
             content.title = task.title
+        }
+        // カテゴリーが何もない時
+        if task.category == "" {
+            // 通知のカテゴリーにローカライズされた(カテゴリーなし)を提供
+            content.subtitle = "(カテゴリーなし )"
+        } else {
+            // カテゴリーがある時は、通知のタイトルにローカライすされたカテゴリーを提供
+            content.subtitle = task.category
         }
         // 内容が何もない時
         if task.contents == "" {

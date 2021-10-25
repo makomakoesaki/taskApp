@@ -13,11 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
 
     //起動プロセスがほぼ完了し、アプリを実行する準備がほぼ整ったことを代理人に通知するインスタンスメソッド
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        //UNUserNotificationCenter.currentは、現在のアプリまたはアプリ拡張機能の通知関連のアクティビティを管理するための中心的なオブジェクト。
+        //現在のアプリまたはアプリ拡張機能の通知関連のアクティビティを管理する
         let center = UNUserNotificationCenter.current()
-        //現在のアプリまたはアプリ拡張機能の通知関連のアクティビティを警報と音とする。ただし、ユーザーに通知するには、ユーザー認証が必要です。
+        //現在のアプリまたはアプリ拡張機能の通知関連のアクティビティを警報と音にする。
+        //ただし、ユーザーに通知するには、ユーザー認証が必要です。
         center.requestAuthorization(options: [.alert, .sound]) { (granted, error) in
-            // 承認に基づいて機能を有効または無効にします
         }
         //UNUserNotificationCenterDelegateプロトコルを自分のクラスに任せる
         center.delegate = self
@@ -26,10 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         return true
     }
 
-    // アプリがフォアグラウンドの時に通知を受け取ると呼ばれるメソッド --- ここから ---
+    // アプリがフォアグラウンドの時に通知を受け取ると呼ばれるメソッド
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .list, .sound])
-    } // --- ここまで追加 ---
+    }
     
     // MARK: UISceneSession Lifecycle
 

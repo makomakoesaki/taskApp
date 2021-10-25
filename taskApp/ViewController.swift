@@ -11,6 +11,7 @@ import RealmSwift
 class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var serch: UITextField!
     
     // Realmインスタンスを取得する
     // try!は、エラーが発生したらアプリを停止する
@@ -25,8 +26,19 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         // Do any additional setup after loading the view.
         tableView.delegate = self
         tableView.dataSource = self
+        // 背景をタップしたらdismissKeyboardメソッドを呼ぶように設定する
+        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(dismissKeyboard))
+        //iPhoneがタップされるのを認識すると、そのタップをキャンセルするをfalseにしました
+        tapGesture.cancelsTouchesInView = false
+        // viewにUITapGestureRecognizerを登録
+        self.view.addGestureRecognizer(tapGesture)
     }
-
+    
+    @objc func dismissKeyboard(){
+        // キーボードを閉じる
+        view.endEditing(true)
+    }
+    
     // UITableViewDataSourceプロトコルのメソッドで、データの数を返す
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return taskArray.count
@@ -85,6 +97,18 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+    }
+    
+    @IBAction func serchButton(_ sender: Any) {
+        let predicate = NSPredicate(format: "category = %@", serch.text!)
+        let result = realm.objects(Task.self).filter(predicate)
+        print(result)
+        if result.isEmpty == true {
+            return
+        } else if result.isEmpty == false {
+            taskArray = result
+            tableView.reloadData()
+        }
     }
     
     // タスク入力画面に遷移する際にデータを渡す
