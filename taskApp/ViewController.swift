@@ -104,7 +104,8 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         let result = realm.objects(Task.self).filter(predicate)
         print(result)
         if result.isEmpty == true {
-            return
+            taskArray = result
+            tableView.reloadData()
         } else if result.isEmpty == false {
             taskArray = result
             tableView.reloadData()
